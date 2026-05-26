@@ -717,18 +717,17 @@
         let lightboxCurrentGroup = null;
         let lightboxCurrentIdx = 0;
 
-        // 如果 localStorage 冇數據，嘗試從 server data.json load
+        // 數據加載：localStorage 優先，server 做 backup
         async function initData() {
             if (Object.keys(allData).length > 0) {
-                // 有 localStorage 數據，直接用 + sync 到 server
+                // ✅ 有 localStorage 數據，先用（最新）
                 pageLoaded = true;
-                syncToServer();
                 return;
             }
             
             // localStorage 空的，從 server load
             try {
-                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/data');
+                const resp = await fetch('https://9cad51f5290bce.lhr.life/api/data');
                 const serverData = await resp.json();
                 if (Object.keys(serverData).length > 0) {
                     allData = serverData;
@@ -755,18 +754,18 @@
                 });
             });
             if (migrated) saveAllData();
-            // 從 server pull 最新數據（接收老闆改嘅嘢）
-            pullFromServer().then(() => {
-                render();
-                updateStorageInfo();
-                startBossUrlPolling();
-            });
+            // 直接 render，用 localStorage 數據（最新）
+            render();
+            updateStorageInfo();
+            startBossUrlPolling();
+            // 後台 sync 到 server（不影響顯示）
+            syncToServer();
         });
         
         // ========== 從 server 拉最新數據（雙向同步） ==========
         async function pullFromServer() {
             try {
-                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/data');
+                const resp = await fetch('https://9cad51f5290bce.lhr.life/api/data');
                 const serverData = await resp.json();
                 const serverKeys = Object.keys(serverData);
                 if (serverKeys.length === 0) return;
@@ -1062,7 +1061,7 @@
         }
 
         function syncToServer() {
-            fetch('https://6adf99e44fadab.lhr.life/api/save', {
+            fetch('https://9cad51f5290bce.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
@@ -1073,7 +1072,7 @@
                     lastSyncOK = true;
                     console.log('✅ Server sync OK (' + data.items + ' 項)');
                     // 自動 publish public HTML
-                    return fetch('https://6adf99e44fadab.lhr.life/api/publish');
+                    return fetch('https://9cad51f5290bce.lhr.life/api/publish');
                 }
             })
             .then(res => res && res.json())
@@ -1095,7 +1094,7 @@
 
         async function updateBossUrl() {
             try {
-                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/url');
+                const resp = await fetch('https://9cad51f5290bce.lhr.life/api/url');
                 const data = await resp.json();
                 const el = document.getElementById('bossLink');
                 const urlEl = document.getElementById('bossUrl');
@@ -1158,12 +1157,12 @@
 
         function triggerDeploy() {
             // Sync to server first
-            fetch('https://6adf99e44fadab.lhr.life/api/save', {
+            fetch('https://9cad51f5290bce.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
             })
-            .then(() => fetch('https://6adf99e44fadab.lhr.life/api/publish'))
+            .then(() => fetch('https://9cad51f5290bce.lhr.life/api/publish'))
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
