@@ -320,27 +320,29 @@
         .modal .form-row { margin-bottom: 12px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
         .btn-cancel { background: #95a5a6; color: white; }
-        /* 编辑按钮 — 无底色，极简 */
+        /* 编辑按钮 — 有底色，清晰易按 */
         .btn-edit { 
-            background: transparent; 
-            color: #888; 
-            border: none;
-            padding: 8px 12px;
+            background: #f0f4ff; 
+            color: #667eea; 
+            border: 1px solid #d0daf0;
+            padding: 6px 12px;
+            border-radius: 8px;
             transition: all 0.15s;
         }
-        .btn-edit:hover { background: #f0f0f0; color: #333; }
-        /* 删除按钮 — 无底色，hover 才露红 */
+        .btn-edit:hover { background: #667eea; color: white; }
+        /* 删除按钮 — 淡底色，hover 变红 */
         button[onclick*="deleteItem"] {
-            background: transparent !important;
-            color: #aaa !important;
-            border: none !important;
-            font-weight: 400 !important;
-            padding: 8px 12px !important;
+            background: #fef0f0 !important;
+            color: #e74c3c !important;
+            border: 1px solid #fad0d0 !important;
+            font-weight: 500 !important;
+            padding: 6px 10px !important;
+            border-radius: 8px !important;
             transition: all 0.15s !important;
         }
         button[onclick*="deleteItem"]:hover {
-            background: #fff0f0 !important;
-            color: #e74c3c !important;
+            background: #e74c3c !important;
+            color: white !important;
         }
 
         /* Image Lightbox Preview */
@@ -685,15 +687,15 @@
             }
             .btn-edit { 
                 flex: 0.8 !important; 
-                background: transparent !important; 
-                color: #999 !important; 
-                border: none !important;
+                background: #e8edff !important; 
+                color: #667eea !important; 
+                border: 1px solid #d0daf0 !important;
             }
             button[onclick*="deleteItem"] { 
                 flex: 0.8 !important; 
-                background: transparent !important; 
-                color: #bbb !important; 
-                border: none !important;
+                background: #fef0f0 !important; 
+                color: #e74c3c !important; 
+                border: 1px solid #fad0d0 !important;
             }
 
             /* ===== Filter 筛选条 ===== */
@@ -853,7 +855,7 @@
         <div class="section previous-unfinished" id="previousSection" style="display:none;">
             <div class="section-header">
                 <div class="section-icon">📋</div>
-                <h2 style="color:#9b59b6;">📋 之前未完成 🔴（需要繼續跟進）</h2>
+                <h2 style="color:#9b59b6;">之前未完成 🔴（需要繼續跟進）</h2>
             </div>
             <div id="previousList"></div>
         </div>
@@ -1977,7 +1979,6 @@
                 list.innerHTML = previousItems.map(item => {
                     const prevTypeLabel = item.type === 'approval' ? '⏳ 待審批' : (item.type === 'notify' ? '🔔 知會' : '✅ 已完成');
                     const typeClass = item.type === 'approval' ? 'approval' : (item.type === 'notify' ? 'notify' : 'done');
-                    const typeTagLabel = item.type === 'approval' ? '🔴待審批' : '🔵知會';
                     const colleagueClass = item.colleague ? '' : 'empty';
                     const colleagueName = item.colleague || '—';
 
@@ -1991,7 +1992,6 @@
                                 <div class="item-meta">
                                     <span class="item-tag" style="background:#f3e8ff;color:#9b59b6;">📅 ${item.dayLabel}</span>
                                     ${item.customer ? `<span class="item-tag" style="background:#f0f4ff;color:#3b5998;border-color:#d0ddf0;">🏢 ${escapeHtml(item.customer)}</span>` : ''}
-                                    <span class="item-tag">${typeTagLabel}</span>
                                     ${item.time ? `<span class="item-tag">⏰ ${item.time}</span>` : ''}
                                 </div>
                                 ${item.files && item.files.length > 0 ? createFilesHTML(item.files) : ''}
