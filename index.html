@@ -863,9 +863,20 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar" id="filterBar" style="display:flex;align-items:center;gap:12px;background:white;border-radius:12px;padding:12px 20px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);flex-wrap:wrap;">
-            <span style="color:#666;font-weight:600;font-size:14px;">🔍 同事篩選：</span>
-            <div id="filterColleagueTags" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
-            <button class="clear-filter-btn" onclick="setColleagueFilter(null)" style="margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid #ddd;background:white;cursor:pointer;font-size:12px;">清除</button>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;">
+                <span style="color:#666;font-weight:600;font-size:14px;white-space:nowrap;">🔍 篩選：</span>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span style="font-size:11px;color:#999;font-weight:500;">👤 同事</span>
+                        <div id="filterColleagueTags" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span style="font-size:11px;color:#999;font-weight:500;">🏢 客人</span>
+                        <div id="filterCustomerTags" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+                    </div>
+                </div>
+                <button class="clear-filter-btn" onclick="setColleagueFilter(null); setCustomerFilter(null);" style="margin-left:auto;padding:5px 14px;border-radius:8px;border:1px solid #ddd;background:white;cursor:pointer;font-size:12px;font-weight:600;">🔄 清除全部</button>
+            </div>
         </div>
 
         <!-- Previous Unfinished Section -->
@@ -884,6 +895,34 @@
                 <div class="form-row">
                     <input type="text" class="form-input" id="itemTitle" placeholder="事項標題...">
                     <input type="text" class="form-input" id="itemColleague" placeholder="同事（如：Maggie）">
+                    <select class="form-input" id="itemCustomer">
+                        <option value="">🏢 客人（可選）</option>
+                        <optgroup label="— Walmart —">
+                            <option value="WM-US">WM-US</option>
+                            <option value="WM-CA">WM-CA</option>
+                            <option value="WALCEN">WM-WALCEN</option>
+                            <option value="WM-Chile">WM-Chile</option>
+                            <option value="WM-MEXICO">WM-MEXICO</option>
+                        </optgroup>
+                        <optgroup label="— Sam's —">
+                            <option value="Sam's US">Sam's US</option>
+                            <option value="Sam's MX">Sam's MX</option>
+                        </optgroup>
+                        <optgroup label="— 其他零售 —">
+                            <option value="Lowes-US">Lowes-US</option>
+                            <option value="Lowes-CA">Lowes-CA</option>
+                            <option value="Rona-CA">Rona-CA</option>
+                            <option value="Meijer">Meijer</option>
+                            <option value="ACE">ACE</option>
+                            <option value="Fred Meyer">Fred Meyer</option>
+                            <option value="THD US">THD US</option>
+                            <option value="LF-Pricesmart">LF-Pricesmart</option>
+                            <option value="DG">DG</option>
+                        </optgroup>
+                        <optgroup label="— 特殊 —">
+                            <option value="Variety">Variety</option>
+                        </optgroup>
+                    </select>
                     <select class="form-input" id="itemType">
                         <option value="approval">⏳ 待審批</option>
                         <option value="notify">🔔 知會</option>
@@ -966,7 +1005,35 @@
                 </div>
                 <div class="form-row">
                     <input type="text" class="form-input" id="editColleague" placeholder="同事" style="grid-column: span 2;">
-                    <select class="form-input" id="editType" style="grid-column: span 2;">
+                    <select class="form-input" id="editCustomer" style="grid-column: span 1;">
+                        <option value="">🏢 客人（可選）</option>
+                        <optgroup label="— Walmart —">
+                            <option value="WM-US">WM-US</option>
+                            <option value="WM-CA">WM-CA</option>
+                            <option value="WALCEN">WM-WALCEN</option>
+                            <option value="WM-Chile">WM-Chile</option>
+                            <option value="WM-MEXICO">WM-MEXICO</option>
+                        </optgroup>
+                        <optgroup label="— Sam's —">
+                            <option value="Sam's US">Sam's US</option>
+                            <option value="Sam's MX">Sam's MX</option>
+                        </optgroup>
+                        <optgroup label="— 其他零售 —">
+                            <option value="Lowes-US">Lowes-US</option>
+                            <option value="Lowes-CA">Lowes-CA</option>
+                            <option value="Rona-CA">Rona-CA</option>
+                            <option value="Meijer">Meijer</option>
+                            <option value="ACE">ACE</option>
+                            <option value="Fred Meyer">Fred Meyer</option>
+                            <option value="THD US">THD US</option>
+                            <option value="LF-Pricesmart">LF-Pricesmart</option>
+                            <option value="DG">DG</option>
+                        </optgroup>
+                        <optgroup label="— 特殊 —">
+                            <option value="Variety">Variety</option>
+                        </optgroup>
+                    </select>
+                    <select class="form-input" id="editType" style="grid-column: span 1;">
                         <option value="approval">⏳ 待審批</option>
                         <option value="notify">🔔 知會</option>
                         <option value="done">✅ 已完成</option>
@@ -1066,6 +1133,7 @@
         let currentDate = new Date();
         let pendingFiles = []; // 待上傳的附件
         let colleagueFilter = null; // 同事篩選
+        let customerFilter = null; // 客人篩選
         let pageLoaded = false; // 防止初始 render 時 save
 
         // 🔍 Lightbox 圖片預覽
@@ -1246,6 +1314,7 @@
         function addItem() {
             const title = document.getElementById('itemTitle').value.trim();
             const colleague = document.getElementById('itemColleague').value.trim();
+            const customer = document.getElementById('itemCustomer').value;
             const desc = document.getElementById('itemDesc').value.trim();
             const type = document.getElementById('itemType').value;
 
@@ -1256,7 +1325,7 @@
 
             const item = {
                 id: 'item-' + Date.now(),
-                title, colleague, desc, type, icon: 'other',
+                title, colleague, customer, desc, type, icon: 'other',
                 time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
                 files: [...pendingFiles]
             };
@@ -1267,6 +1336,7 @@
 
             document.getElementById('itemTitle').value = '';
             document.getElementById('itemColleague').value = '';
+            document.getElementById('itemCustomer').value = '';
             document.getElementById('itemDesc').value = '';
             clearFiles();
         }
@@ -1833,10 +1903,13 @@
             const dayItems = allData[dateKey] || [];
             const allItemsUnfiltered = [...dayItems];
 
-            // 應用同事篩選
+            // 應用同事 + 客人篩選
             let filteredItems = dayItems;
             if (colleagueFilter) {
-                filteredItems = dayItems.filter(i => i.colleague === colleagueFilter);
+                filteredItems = filteredItems.filter(i => i.colleague === colleagueFilter);
+            }
+            if (customerFilter) {
+                filteredItems = filteredItems.filter(i => i.customer === customerFilter);
             }
 
             const approvals = filteredItems.filter(i => i.type === 'approval');
@@ -1850,6 +1923,7 @@
 
             // 渲染篩選bar
             renderColleagueFilter(dayItems);
+            renderCustomerFilter(dayItems);
 
             // 渲染列表
             document.getElementById('approvalList').innerHTML = approvals.length ?
@@ -1930,6 +2004,7 @@
                                 ${item.desc ? `<div class="item-desc">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>` : ''}
                                 <div class="item-meta">
                                     <span class="item-tag" style="background:#f3e8ff;color:#9b59b6;">📅 ${item.dayLabel}</span>
+                                    ${item.customer ? `<span class="item-tag" style="background:#f0f4ff;color:#3b5998;border-color:#d0ddf0;">🏢 ${escapeHtml(item.customer)}</span>` : ''}
                                     <span class="item-tag">${typeTagLabel}</span>
                                     ${item.time ? `<span class="item-tag">⏰ ${item.time}</span>` : ''}
                                 </div>
@@ -2027,6 +2102,7 @@
                         ${item.desc ? `<div class="item-desc">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>` : ''}
                         ${filesHTML}
                         <div class="item-meta">
+                            ${item.customer ? `<span class="item-tag" style="background:#f0f4ff;color:#3b5998;border-color:#d0ddf0;">🏢 ${escapeHtml(item.customer)}</span>` : ''}
                             <span class="item-tag">${item.time || ''}</span>
                         </div>
                     </div>
@@ -2077,6 +2153,53 @@
             render();
         }
 
+        // ========== 客人篩選 ==========
+        const CUSTOMER_LIST = [
+            'Variety','DG','Lowes-CA','Lowes-US','Rona-CA','Meijer',
+            "Sam's US","Sam's MX",'LF-Pricesmart','THD US',
+            'WM-Chile','WM-CA','WM-US','WALCEN','WM-MEXICO','Fred Meyer','ACE'
+        ];
+
+        function renderCustomerFilter(items) {
+            const container = document.getElementById('filterCustomerTags');
+            
+            // 收集當日有嘅客人
+            const usedCustomers = [...new Set(
+                items.map(i => i.customer).filter(c => c)
+            )].sort();
+
+            if (usedCustomers.length === 0) {
+                container.innerHTML = '<span style="color:#ccc;font-size:12px;">無客人記錄</span>';
+                return;
+            }
+
+            container.innerHTML = usedCustomers.map(c => {
+                const active = customerFilter === c ? ' active' : '';
+                // 用不同色系區分客人
+                const colorMap = {
+                    'WM-US': '#e74c3c', 'WM-CA': '#e67e22', 'WALCEN': '#f39c12',
+                    'WM-Chile': '#d35400', 'WM-MEXICO': '#e67e22',
+                    "Sam's US": '#3498db', "Sam's MX": '#2980b9',
+                    'Lowes-US': '#9b59b6', 'Lowes-CA': '#8e44ad', 'Rona-CA': '#a569bd',
+                    'Meijer': '#1abc9c', 'ACE': '#16a085', 'Fred Meyer': '#27ae60',
+                    'THD US': '#c0392b', 'LF-Pricesmart': '#d4a017',
+                    'DG': '#7f8c8d', 'Variety': '#95a5a6'
+                };
+                const bgColor = colorMap[c] || '#666';
+                return `<span class="filter-tag${active}" data-customer="${escapeHtml(c)}" onclick="setCustomerFilter(this.getAttribute('data-customer'))" 
+                    style="${active ? `background:${bgColor}!important;color:white!important;border-color:${bgColor}!important;` : ''}">🏢 ${escapeHtml(c)}</span>`;
+            }).join('');
+        }
+
+        function setCustomerFilter(customer) {
+            if (customer === null || customer === '') {
+                customerFilter = null;
+            } else {
+                customerFilter = customer;
+            }
+            render();
+        }
+
         // ========== 編輯功能 ==========
         let editPendingFiles = []; // edit modal 嘅暫存附件
 
@@ -2090,6 +2213,7 @@
             document.getElementById('editItemDate').value = dateKey;
             document.getElementById('editTitle').value = item.title;
             document.getElementById('editColleague').value = item.colleague || '';
+            document.getElementById('editCustomer').value = item.customer || '';
             document.getElementById('editDesc').value = item.desc || '';
             document.getElementById('editType').value = item.type;
 
@@ -2246,6 +2370,7 @@
             const dateKey = document.getElementById('editItemDate').value;
             const title = document.getElementById('editTitle').value.trim();
             const colleague = document.getElementById('editColleague').value.trim();
+            const customer = document.getElementById('editCustomer').value;
             const desc = document.getElementById('editDesc').value.trim();
             const type = document.getElementById('editType').value;
 
@@ -2255,6 +2380,7 @@
             if (item) {
                 item.title = title;
                 item.colleague = colleague;
+                item.customer = customer;
                 item.desc = desc;
                 item.type = type;
                 item.files = editPendingFiles;
