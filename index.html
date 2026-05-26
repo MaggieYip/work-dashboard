@@ -167,6 +167,23 @@
         .item-card.approval .item-icon { background: #fff0f5; color: #be185d; }
         .item-card.notify .item-icon { background: #eff6ff; color: #1d4ed8; }
         .item-card.done .item-icon { background: #f0fdf4; color: #166534; }
+        .item-left-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .item-customer-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            background: #f0f4ff;
+            color: #3b5998;
+            border: 1px solid #d0ddf0;
+            white-space: nowrap;
+            line-height: 20px;
+        }
         .item-content { flex: 1; }
         .item-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
         .item-desc { font-size: 13px; color: #666; margin-bottom: 6px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
@@ -621,11 +638,18 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
             }
 
-            /* 第一行：类型标签 + 标题（横排）*/
-            .item-card > .item-icon {
+            /* 第一行：类型标签 + 客人标签（横排）*/
+            .item-card > .item-left-row {
                 position: absolute !important;
-                top: 12px !important;
+                top: 10px !important;
                 left: 14px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                z-index: 1 !important;
+            }
+            .item-card > .item-left-row > .item-icon {
+                position: static !important;
                 width: auto !important;
                 height: 24px !important;
                 min-width: auto !important;
@@ -633,7 +657,6 @@
                 font-weight: 700 !important;
                 flex-shrink: 0 !important;
                 border-radius: 6px !important;
-                z-index: 1 !important;
                 padding: 2px 8px !important;
                 line-height: 20px !important;
                 white-space: nowrap !important;
@@ -644,8 +667,13 @@
             .item-card.notify > .item-icon {
                 background: #eff6ff !important; color: #1d4ed8 !important;
             }
-            .item-card.done > .item-icon {
+            .item-card.done > .item-left-row > .item-icon {
                 background: #f0fdf4 !important; color: #166534 !important;
+            }
+            .item-card > .item-left-row > .item-customer-tag {
+                font-size: 10px !important;
+                padding: 2px 7px !important;
+                line-height: 18px !important;
             }
 
             /* 同事名隐藏 */
@@ -1973,9 +2001,9 @@
             document.getElementById('notifyCount').textContent = notifies.length;
             document.getElementById('doneCount').textContent = dones.length;
 
-            // 渲染篩選bar
+            // 渲染篩選bar — 客人篩選用未過濾數據，確保所有客人都顯示
             renderColleagueFilter(dayItems);
-            renderCustomerFilter(dayItems);
+            renderCustomerFilter(allItemsUnfiltered);
 
             // 渲染列表
             document.getElementById('approvalList').innerHTML = approvals.length ?
@@ -2048,14 +2076,16 @@
 
                     return `
                         <div class="item-card ${typeClass}">
-                            <div class="item-icon">${prevTypeLabel}</div>
+                            <div class="item-left-row">
+                                <div class="item-icon">${prevTypeLabel}</div>
+                                ${item.customer ? `<span class="item-customer-tag">🏢 ${escapeHtml(item.customer)}</span>` : ''}
+                            </div>
                             <div class="item-colleague-col ${colleagueClass}">${escapeHtml(colleagueName)}</div>
                             <div class="item-content">
                                 <div class="item-title">${escapeHtml(item.title)}</div>
                                 ${item.desc ? `<div class="item-desc">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>` : ''}
                                 <div class="item-meta">
                                     <span class="item-tag" style="background:#f3e8ff;color:#9b59b6;">📅 ${item.dayLabel}</span>
-                                    ${item.customer ? `<span class="item-tag" style="background:#f0f4ff;color:#3b5998;border-color:#d0ddf0;">🏢 ${escapeHtml(item.customer)}</span>` : ''}
                                     ${item.time ? `<span class="item-tag">⏰ ${item.time}</span>` : ''}
                                 </div>
                                 ${item.files && item.files.length > 0 ? createFilesHTML(item.files) : ''}
@@ -2145,14 +2175,16 @@
 
             return `
                 <div class="item-card ${item.type}" data-item-id="${item.id}">
-                    <div class="item-icon">${typeLabel}</div>
+                    <div class="item-left-row">
+                        <div class="item-icon">${typeLabel}</div>
+                        ${item.customer ? `<span class="item-customer-tag">🏢 ${escapeHtml(item.customer)}</span>` : ''}
+                    </div>
                     <div class="item-colleague-col ${colleagueClass}">${escapeHtml(colleagueName)}</div>
                     <div class="item-content">
                         <div class="item-title">${escapeHtml(item.title)}</div>
                         ${item.desc ? `<div class="item-desc">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>` : ''}
                         ${filesHTML}
                         <div class="item-meta">
-                            ${item.customer ? `<span class="item-tag" style="background:#f0f4ff;color:#3b5998;border-color:#d0ddf0;">🏢 ${escapeHtml(item.customer)}</span>` : ''}
                             <span class="item-tag">${item.time || ''}</span>
                         </div>
                     </div>
@@ -2205,9 +2237,10 @@
 
         // ========== 客人篩選 ==========
         const CUSTOMER_LIST = [
-            'Variety','DG','Lowes-CA','Lowes-US','Rona-CA','Meijer',
+            'Variety','DG','Lowes-US','Rona-CA','Meijer',
             "Sam's US","Sam's MX",'LF-Pricesmart','THD US',
-            'WM-Chile','WM-CA','WM-US','WALCEN','WM-MEXICO','Fred Meyer','ACE'
+            'WM-Chile','WM-CA','WM-US','WM-WALCEN','WM-MEXICO','Fred Meyer','ACE',
+            'Costco US','Costco UK','Costco Japan','Costco Spain','Costco Canada','Costco AU','Costco MX'
         ];
 
         function renderCustomerFilter(items) {
@@ -2227,10 +2260,13 @@
                 const active = customerFilter === c ? ' active' : '';
                 // 用不同色系區分客人
                 const colorMap = {
-                    'WM-US': '#e74c3c', 'WM-CA': '#e67e22', 'WALCEN': '#f39c12',
+                    'WM-US': '#e74c3c', 'WM-CA': '#e67e22', 'WM-WALCEN': '#f39c12',
                     'WM-Chile': '#d35400', 'WM-MEXICO': '#e67e22',
                     "Sam's US": '#3498db', "Sam's MX": '#2980b9',
-                    'Lowes-US': '#9b59b6', 'Lowes-CA': '#8e44ad', 'Rona-CA': '#a569bd',
+                    'Costco US': '#c4302b', 'Costco UK': '#005daa', 'Costco Japan': '#e60012',
+                    'Costco Spain': '#ee7203', 'Costco Canada': '#c4302b', 'Costco AU': '#0075be',
+                    'Costco MX': '#c4302b',
+                    'Lowes-US': '#9b59b6', 'Rona-CA': '#a569bd',
                     'Meijer': '#1abc9c', 'ACE': '#16a085', 'Fred Meyer': '#27ae60',
                     'THD US': '#c0392b', 'LF-Pricesmart': '#d4a017',
                     'DG': '#7f8c8d', 'Variety': '#95a5a6'
