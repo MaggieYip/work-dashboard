@@ -152,17 +152,21 @@
         }
         .item-card:last-child { margin-bottom: 0; }
         .item-icon {
-            width: 42px; height: 42px;
-            border-radius: 10px;
+            width: auto; height: 26px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
             flex-shrink: 0;
+            padding: 2px 10px;
+            line-height: 22px;
+            white-space: nowrap;
         }
-        .item-card.approval .item-icon { background: #e74c3c; color: white; }
-        .item-card.notify .item-icon { background: #3498db; color: white; }
-        .item-card.done .item-icon { background: #27ae60; color: white; }
+        .item-card.approval .item-icon { background: #fff0f5; color: #be185d; }
+        .item-card.notify .item-icon { background: #eff6ff; color: #1d4ed8; }
+        .item-card.done .item-icon { background: #f0fdf4; color: #166534; }
         .item-content { flex: 1; }
         .item-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
         .item-desc { font-size: 13px; color: #666; margin-bottom: 6px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
@@ -575,27 +579,41 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
             }
 
-            /* 第一行：图标 + 标题（横排）*/
+            /* 第一行：类型标签 + 标题（横排）*/
             .item-card > .item-icon {
                 position: absolute !important;
-                top: 14px !important;
+                top: 12px !important;
                 left: 14px !important;
-                width: 36px !important;
-                height: 36px !important;
+                width: auto !important;
+                height: 24px !important;
                 min-width: auto !important;
-                font-size: 18px !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
                 flex-shrink: 0 !important;
-                border-radius: 10px !important;
+                border-radius: 6px !important;
                 z-index: 1 !important;
+                padding: 2px 8px !important;
+                line-height: 20px !important;
+                white-space: nowrap !important;
+            }
+            .item-card.approval > .item-icon {
+                background: #fff0f5 !important; color: #be185d !important;
+            }
+            .item-card.notify > .item-icon {
+                background: #eff6ff !important; color: #1d4ed8 !important;
+            }
+            .item-card.done > .item-icon {
+                background: #f0fdf4 !important; color: #166534 !important;
             }
 
             /* 同事名隐藏 */
             .item-colleague-col { display: none !important; }
 
-            /* 内容区：左边留空给图标 */
+            /* 内容区：左边留空给类型标签 */
             .item-content {
                 width: 100% !important;
-                padding-left: 48px !important;  /* 留出图标空间 */
+                padding-left: 0 !important;  /* 标签系 absolute，唔使留空 */
+                padding-top: 28px !important;  /* 留出标签高度空间 */
                 padding-right: 0 !important;
                 padding-bottom: 52px !important;  /* 留出按钮空间 */
                 box-sizing: border-box !important;
@@ -759,7 +777,7 @@
             .stats { gap: 5px !important; }
             .nav-btn { width: 34px; height: 34px; font-size: 14px !important; border-radius: 8px !important; }
             .today-btn { font-size: 11px !important; padding: 5px 9px !important; }
-            .item-icon { width: 32px !important; height: 32px !important; font-size: 16px !important; top: 12px !important; left: 12px !important; }
+            .item-icon { font-size: 10px !important; padding: 2px 6px !important; height: auto !important; top: 10px !important; left: 10px !important; }
             .btn-sm { font-size: 11.5px !important; padding: 7px 3px !important; }
             .item-actions { bottom: 8px !important; left: 10px !important; right: 10px !important; }
             .item-card { padding: 12px !important; border-radius: 12px !important; }
@@ -1062,7 +1080,7 @@
                 // ✅ 有 localStorage 數據，先用
                 // 但嘗試從 server 補回附件數據
                 try {
-                    const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
+                    const resp = await fetch('https://62c6ed0b17a4cf.lhr.life/api/data');
                     const serverData = await resp.json();
                     // 用 server 的附件補充 localStorage 數據
                     for (const dateKey of Object.keys(serverData)) {
@@ -1085,7 +1103,7 @@
             
             // localStorage 空的，從 server load 完整數據
             try {
-                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
+                const resp = await fetch('https://62c6ed0b17a4cf.lhr.life/api/data');
                 const serverData = await resp.json();
                 if (Object.keys(serverData).length > 0) {
                     allData = serverData;
@@ -1133,7 +1151,7 @@
         // ========== 從 server 拉最新數據（雙向同步） ==========
         async function pullFromServer() {
             try {
-                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
+                const resp = await fetch('https://62c6ed0b17a4cf.lhr.life/api/data');
                 const serverData = await resp.json();
                 const serverKeys = Object.keys(serverData);
                 if (serverKeys.length === 0) return;
@@ -1502,7 +1520,7 @@
         }
 
         function syncToServer() {
-            fetch('https://5e0099a8be40a1.lhr.life/api/save', {
+            fetch('https://62c6ed0b17a4cf.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
@@ -1514,7 +1532,7 @@
                     console.log('✅ Server sync OK (' + data.items + ' 項)');
                     updateSaveBadge(true);
                     // 自動 publish public HTML
-                    return fetch('https://5e0099a8be40a1.lhr.life/api/publish');
+                    return fetch('https://62c6ed0b17a4cf.lhr.life/api/publish');
                 } else {
                     lastSyncOK = false;
                     updateSaveBadge(false);
@@ -1540,7 +1558,7 @@
 
         async function updateBossUrl() {
             try {
-                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/url');
+                const resp = await fetch('https://62c6ed0b17a4cf.lhr.life/api/url');
                 const data = await resp.json();
                 const el = document.getElementById('bossLink');
                 const urlEl = document.getElementById('bossUrl');
@@ -1603,12 +1621,12 @@
 
         function triggerDeploy() {
             // Sync to server first
-            fetch('https://5e0099a8be40a1.lhr.life/api/save', {
+            fetch('https://62c6ed0b17a4cf.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
             })
-            .then(() => fetch('https://5e0099a8be40a1.lhr.life/api/publish'))
+            .then(() => fetch('https://62c6ed0b17a4cf.lhr.life/api/publish'))
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
@@ -1897,22 +1915,22 @@
             } else {
                 section.style.display = 'block';
                 list.innerHTML = previousItems.map(item => {
-                    const icon = icons[item.icon] || icons.other;
-                    const typeClass = item.type === 'approval' ? 'approval' : 'notify';
-                    const typeLabel = item.type === 'approval' ? '🔴待審批' : '🔵知會';
+                    const prevTypeLabel = item.type === 'approval' ? '⏳ 待審批' : (item.type === 'notify' ? '🔔 知會' : '✅ 已完成');
+                    const typeClass = item.type === 'approval' ? 'approval' : (item.type === 'notify' ? 'notify' : 'done');
+                    const typeTagLabel = item.type === 'approval' ? '🔴待審批' : '🔵知會';
                     const colleagueClass = item.colleague ? '' : 'empty';
                     const colleagueName = item.colleague || '—';
 
                     return `
                         <div class="item-card ${typeClass}">
-                            <div class="item-icon">${icon}</div>
+                            <div class="item-icon">${prevTypeLabel}</div>
                             <div class="item-colleague-col ${colleagueClass}">${escapeHtml(colleagueName)}</div>
                             <div class="item-content">
                                 <div class="item-title">${escapeHtml(item.title)}</div>
                                 ${item.desc ? `<div class="item-desc">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>` : ''}
                                 <div class="item-meta">
                                     <span class="item-tag" style="background:#f3e8ff;color:#9b59b6;">📅 ${item.dayLabel}</span>
-                                    <span class="item-tag">${typeLabel}</span>
+                                    <span class="item-tag">${typeTagLabel}</span>
                                     ${item.time ? `<span class="item-tag">⏰ ${item.time}</span>` : ''}
                                 </div>
                                 ${item.files && item.files.length > 0 ? createFilesHTML(item.files) : ''}
@@ -1988,7 +2006,13 @@
         }
 
         function createItemHTML(item) {
-            const icon = icons[item.icon] || icons.other;
+            // 圖標改為類型文字：待審批/知會/已完成
+            let typeLabel = '';
+            if (item.type === 'approval') typeLabel = '⏳ 待審批';
+            else if (item.type === 'notify') typeLabel = '🔔 知會';
+            else if (item.type === 'done') typeLabel = '✅ 已完成';
+            else typeLabel = '📌 其他';
+
             const filesHTML = item.files && item.files.length > 0 ? createFilesHTML(item.files) : '';
             const dateKey = formatDateKey(currentDate);
             const colleagueClass = item.colleague ? '' : 'empty';
@@ -1996,7 +2020,7 @@
 
             return `
                 <div class="item-card ${item.type}" data-item-id="${item.id}">
-                    <div class="item-icon">${icon}</div>
+                    <div class="item-icon">${typeLabel}</div>
                     <div class="item-colleague-col ${colleagueClass}">${escapeHtml(colleagueName)}</div>
                     <div class="item-content">
                         <div class="item-title">${escapeHtml(item.title)}</div>
