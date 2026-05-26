@@ -728,7 +728,7 @@
             
             // localStorage 空的，從 server load
             try {
-                const resp = await fetch('https://fb65a81105a7b0.lhr.life/api/data');
+                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/data');
                 const serverData = await resp.json();
                 if (Object.keys(serverData).length > 0) {
                     allData = serverData;
@@ -766,7 +766,7 @@
         // ========== 從 server 拉最新數據（雙向同步） ==========
         async function pullFromServer() {
             try {
-                const resp = await fetch('https://fb65a81105a7b0.lhr.life/api/data');
+                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/data');
                 const serverData = await resp.json();
                 const serverKeys = Object.keys(serverData);
                 if (serverKeys.length === 0) return;
@@ -1062,7 +1062,7 @@
         }
 
         function syncToServer() {
-            fetch('https://fb65a81105a7b0.lhr.life/api/save', {
+            fetch('https://6adf99e44fadab.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
@@ -1073,7 +1073,7 @@
                     lastSyncOK = true;
                     console.log('✅ Server sync OK (' + data.items + ' 項)');
                     // 自動 publish public HTML
-                    return fetch('https://fb65a81105a7b0.lhr.life/api/publish');
+                    return fetch('https://6adf99e44fadab.lhr.life/api/publish');
                 }
             })
             .then(res => res && res.json())
@@ -1095,7 +1095,7 @@
 
         async function updateBossUrl() {
             try {
-                const resp = await fetch('https://fb65a81105a7b0.lhr.life/api/url');
+                const resp = await fetch('https://6adf99e44fadab.lhr.life/api/url');
                 const data = await resp.json();
                 const el = document.getElementById('bossLink');
                 const urlEl = document.getElementById('bossUrl');
@@ -1158,12 +1158,12 @@
 
         function triggerDeploy() {
             // Sync to server first
-            fetch('https://fb65a81105a7b0.lhr.life/api/save', {
+            fetch('https://6adf99e44fadab.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
             })
-            .then(() => fetch('https://fb65a81105a7b0.lhr.life/api/publish'))
+            .then(() => fetch('https://6adf99e44fadab.lhr.life/api/publish'))
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
