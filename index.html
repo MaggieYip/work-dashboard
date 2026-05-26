@@ -316,7 +316,18 @@
         .modal .form-row { margin-bottom: 12px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
         .btn-cancel { background: #95a5a6; color: white; }
-        .btn-edit { background: #e67e22; color: white; }
+        .btn-edit { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
+        .btn-edit:hover { background: #e9ecef; }
+        /* 删除按钮 — 柔和红灰，唔抢眼 */
+        button[onclick*="deleteItem"] {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
+            font-weight: 600;
+        }
+        button[onclick*="deleteItem"]:hover {
+            background: #fee2e2 !important;
+        }
 
         /* Image Lightbox Preview */
         .lightbox-overlay {
@@ -641,9 +652,18 @@
                 min-width: 0 !important;
                 white-space: nowrap !important;
             }
-            .btn-edit { flex: 0.8 !important; }
-            .btn-primary.btn-danger-like, 
-            button[onclick*="deleteItem"] { flex: 0.8 !important; }
+            .btn-edit { 
+                flex: 0.8 !important; 
+                background: #f1f3f5 !important; 
+                color: #495057 !important; 
+                border: 1px solid #dee2e6 !important;
+            }
+            button[onclick*="deleteItem"] { 
+                flex: 0.8 !important; 
+                background: #fef2f2 !important; 
+                color: #dc2626 !important; 
+                border: 1px solid #fecaca !important;
+            }
 
             /* ===== Filter 筛选条 ===== */
             .filter-bar { 
@@ -1017,7 +1037,7 @@
                 // ✅ 有 localStorage 數據，先用
                 // 但嘗試從 server 補回附件數據
                 try {
-                    const resp = await fetch('https://920a29dbbd5563.lhr.life/api/data');
+                    const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
                     const serverData = await resp.json();
                     // 用 server 的附件補充 localStorage 數據
                     for (const dateKey of Object.keys(serverData)) {
@@ -1040,7 +1060,7 @@
             
             // localStorage 空的，從 server load 完整數據
             try {
-                const resp = await fetch('https://920a29dbbd5563.lhr.life/api/data');
+                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
                 const serverData = await resp.json();
                 if (Object.keys(serverData).length > 0) {
                     allData = serverData;
@@ -1088,7 +1108,7 @@
         // ========== 從 server 拉最新數據（雙向同步） ==========
         async function pullFromServer() {
             try {
-                const resp = await fetch('https://920a29dbbd5563.lhr.life/api/data');
+                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/data');
                 const serverData = await resp.json();
                 const serverKeys = Object.keys(serverData);
                 if (serverKeys.length === 0) return;
@@ -1457,7 +1477,7 @@
         }
 
         function syncToServer() {
-            fetch('https://920a29dbbd5563.lhr.life/api/save', {
+            fetch('https://5e0099a8be40a1.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
@@ -1469,7 +1489,7 @@
                     console.log('✅ Server sync OK (' + data.items + ' 項)');
                     updateSaveBadge(true);
                     // 自動 publish public HTML
-                    return fetch('https://920a29dbbd5563.lhr.life/api/publish');
+                    return fetch('https://5e0099a8be40a1.lhr.life/api/publish');
                 } else {
                     lastSyncOK = false;
                     updateSaveBadge(false);
@@ -1495,7 +1515,7 @@
 
         async function updateBossUrl() {
             try {
-                const resp = await fetch('https://920a29dbbd5563.lhr.life/api/url');
+                const resp = await fetch('https://5e0099a8be40a1.lhr.life/api/url');
                 const data = await resp.json();
                 const el = document.getElementById('bossLink');
                 const urlEl = document.getElementById('bossUrl');
@@ -1558,12 +1578,12 @@
 
         function triggerDeploy() {
             // Sync to server first
-            fetch('https://920a29dbbd5563.lhr.life/api/save', {
+            fetch('https://5e0099a8be40a1.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
             })
-            .then(() => fetch('https://920a29dbbd5563.lhr.life/api/publish'))
+            .then(() => fetch('https://5e0099a8be40a1.lhr.life/api/publish'))
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
