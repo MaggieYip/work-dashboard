@@ -405,8 +405,11 @@
             cursor: pointer;
             z-index: 2001;
             transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.35); }
         .lightbox-prev { left: 16px; }
         .lightbox-next { right: 16px; }
 
@@ -729,6 +732,18 @@
 
             /* ===== Calendar 日历小格 ===== */
             .cal-date { font-size: 11px !important; padding: 5px 7px !important; }
+
+            /* ===== Lightbox 手機增強 ===== */
+            .lightbox-nav {
+                width: 44px !important; height: 44px !important;
+                font-size: 18px !important;
+                background: rgba(255,255,255,0.2) !important;
+            }
+            .lightbox-close {
+                width: 40px !important; height: 40px !important;
+                top: 14px !important; right: 14px !important;
+                font-size: 22px !important;
+            }
         }
 
         /* 超小屏幕 iPhone SE 等 (<380px) */
@@ -759,7 +774,21 @@
     button[onclick*="exportData"] {
         display: none !important;
     }
-    /* Netlify 同步 banner - 已移除 */
+    /* Netlify 同步 banner */
+    body::before {
+        content: "📡 Netlify 永久版 - 修改會自動同步俾 Kingsley（每 60s 刷新）";
+        display: block;
+        text-align: center;
+        background: #d4edda;
+        color: #155724;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        border-bottom: 2px solid #28a745;
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+    }
     
 </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
@@ -2129,6 +2158,15 @@
                 a.download = fileObj.name;
                 a.click();
             };
+            // 更新計數器
+            const group = window._lightboxGroups[lightboxCurrentGroup];
+            if (group && group.length > 1) {
+                document.getElementById('lightboxCounter').textContent = 
+                    (lightboxCurrentIdx + 1) + ' / ' + group.length;
+                document.getElementById('lightboxCounter').style.display = 'inline';
+            } else {
+                document.getElementById('lightboxCounter').style.display = 'none';
+            }
         }
 
         function updateLightboxNav(group) {
@@ -2138,8 +2176,8 @@
                 prev.style.display = 'none';
                 next.style.display = 'none';
             } else {
-                prev.style.display = 'block';
-                next.style.display = 'block';
+                prev.style.display = 'flex';
+                next.style.display = 'flex';
             }
         }
 
@@ -2154,6 +2192,30 @@
             document.getElementById('lightbox').classList.remove('active');
             lightboxCurrentGroup = null;
         }
+
+        // 📱 觸屏滑動支援
+        (function() {
+            let touchStartX = 0, touchStartY = 0;
+            document.addEventListener('DOMContentLoaded', function() {
+                const lb = document.getElementById('lightbox');
+                lb.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 1) {
+                        touchStartX = e.touches[0].clientX;
+                        touchStartY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+                lb.addEventListener('touchend', function(e) {
+                    if (!lightboxCurrentGroup) return;
+                    const group = window._lightboxGroups[lightboxCurrentGroup];
+                    if (!group || group.length <= 1) return;
+                    const dx = (e.changedTouches[0] || {}).clientX - touchStartX;
+                    const dy = Math.abs((e.changedTouches[0] || {}).clientY - touchStartY);
+                    if (Math.abs(dx) > 50 && Math.abs(dx) > dy) {
+                        navigateLightbox(dx < 0 ? 1 : -1);
+                    }
+                });
+            });
+        })();
 
         function saveEdit() {
             const id = document.getElementById('editItemId').value;
@@ -2379,6 +2441,7 @@
         <img id="lightboxImg" src="" alt="">
         <div class="lightbox-info">
             <span id="lightboxName"></span>
+            <span id="lightboxCounter" style="color:#999;font-size:12px;display:none;"></span>
             <button class="lightbox-download" id="lightboxDownload">⬇ 下載</button>
         </div>
     </div>
