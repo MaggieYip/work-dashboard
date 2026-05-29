@@ -880,8 +880,24 @@
             .item-card { padding: 12px !important; border-radius: 12px !important; }
             .item-content { padding-bottom: 46px !important; }
         }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    /* === Netlify 版 - 隱藏 admin 控制項 === */
+    #bossLink,
+    button[onclick*="triggerDeploy"],
+    button[onclick*="exportAsHTML"],
+    button[onclick*="importData"],
+    button[onclick*="exportData"] {
+        display: none !important;
+    }
+    /* Netlify 同步 banner - 已移除 */
+    
+</style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+    /* === Netlify 同步模式 === */
+    window.__IS_NETLIFY__ = true;
+    setInterval(function() { location.reload(); }, 60000);
+    
+</script>
 </head>
 <body>
     <div class="container">
@@ -1233,7 +1249,7 @@
                 // ✅ 有 localStorage 數據，先用
                 // 但嘗試從 server 補回附件數據
                 try {
-                    const resp = await fetch('http://localhost:8765/api/data');
+                    const resp = await fetch('https://4bf60010666caa.lhr.life/api/data');
                     const serverData = await resp.json();
                     // 用 server 的附件補充 localStorage 數據
                     for (const dateKey of Object.keys(serverData)) {
@@ -1256,7 +1272,7 @@
             
             // localStorage 空的，從 server load 完整數據
             try {
-                const resp = await fetch('http://localhost:8765/api/data');
+                const resp = await fetch('https://4bf60010666caa.lhr.life/api/data');
                 const serverData = await resp.json();
                 if (Object.keys(serverData).length > 0) {
                     allData = serverData;
@@ -1310,7 +1326,7 @@
         // ========== 從 server 拉最新數據（雙向同步） ==========
         async function pullFromServer() {
             try {
-                const resp = await fetch('http://localhost:8765/api/data');
+                const resp = await fetch('https://4bf60010666caa.lhr.life/api/data');
                 const serverData = await resp.json();
                 const serverKeys = Object.keys(serverData);
                 if (serverKeys.length === 0) return;
@@ -1680,7 +1696,7 @@
         }
 
         function syncToServer() {
-            fetch('http://localhost:8765/api/save', {
+            fetch('https://4bf60010666caa.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
@@ -1692,7 +1708,7 @@
                     console.log('✅ Server sync OK (' + data.items + ' 項)');
                     updateSaveBadge(true);
                     // 自動 publish public HTML
-                    return fetch('http://localhost:8765/api/publish');
+                    return fetch('https://4bf60010666caa.lhr.life/api/publish');
                 } else {
                     lastSyncOK = false;
                     updateSaveBadge(false);
@@ -1718,7 +1734,7 @@
 
         async function updateBossUrl() {
             try {
-                const resp = await fetch('http://localhost:8765/api/url');
+                const resp = await fetch('https://4bf60010666caa.lhr.life/api/url');
                 const data = await resp.json();
                 const el = document.getElementById('bossLink');
                 const urlEl = document.getElementById('bossUrl');
@@ -1781,12 +1797,12 @@
 
         function triggerDeploy() {
             // Sync to server first
-            fetch('http://localhost:8765/api/save', {
+            fetch('https://4bf60010666caa.lhr.life/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ allData: allData })
             })
-            .then(() => fetch('http://localhost:8765/api/publish'))
+            .then(() => fetch('https://4bf60010666caa.lhr.life/api/publish'))
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
@@ -2672,7 +2688,12 @@
                 }
             }
         });
-    </script>
+    
+    /* === Netlify 同步模式 === */
+    window.__IS_NETLIFY__ = true;
+    setInterval(function() { location.reload(); }, 60000);
+    
+</script>
 
     <!-- Image Lightbox Preview -->
     <div class="lightbox-overlay" id="lightbox">
